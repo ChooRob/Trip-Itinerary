@@ -79,13 +79,13 @@
             <h1 class="text-2xl font-bold">April - May Trip</h1>
             <p class="text-indigo-100 dark:text-indigo-200 opacity-90">Toronto • Singapore • Cruise • Japan</p>
         </div>
-        <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-indigo-500 dark:hover:bg-indigo-800 transition-colors" aria-label="Toggle Dark Mode">
-            <!-- Moon icon (shows in light mode) -->
-            <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-            </svg>
-            <!-- Sun icon (shows in dark mode) -->
-            <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex gap-2">
+            <button onclick="toggleEditMode()" class="p-2 rounded-full hover:bg-indigo-500 dark:bg-indigo-800 transition-colors text-white" aria-label="Toggle Edit Mode">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            </button>
+            <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-indigo-500 dark:hover:bg-indigo-800 transition-colors" aria-label="Toggle Dark Mode">
+                <!-- Moon icon (shows in light mode) -->
+                <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
             </svg>
         </button>
@@ -110,8 +110,52 @@
         <!-- Content will be injected by JavaScript -->
     </main>
 
-    <script>
-        const itineraryData = [
+    <!-- Edit/Add Modal -->
+    <div id="activityModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+            <h2 id="modalTitle" class="text-xl font-bold mb-4 dark:text-white">Add Activity</h2>
+            <form id="activityForm" class="flex flex-col gap-3">
+                <input type="hidden" id="modalDayIndex">
+                <input type="hidden" id="modalEventIndex">
+                
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Time</label>
+                    <input type="text" id="eventTime" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="e.g., 2:00 PM or Morning" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Activity Title</label>
+                    <input type="text" id="eventActivity" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Details/Comments</label>
+                    <textarea id="eventDetails" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" rows="2"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Type (Icon & Color)</label>
+                    <select id="eventType" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                        <option value="sightseeing">📸 Sightseeing</option>
+                        <option value="food">🍜 Food</option>
+                        <option value="flight">✈️ Flight</option>
+                        <option value="hotel">🏨 Hotel</option>
+                        <option value="cruise">🚢 Cruise</option>
+                        <option value="booking">🎟️ Booking/Ticket</option>
+                        <option value="special">🎉 Special</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-semibold transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold transition-colors">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const defaultItineraryData = [
             { date: "April 14", location: "Toronto, Canada", events: [{ time: "1:25 PM", activity: "Board Plane at Toronto Pearson", type: "flight" }] },
             { date: "April 15", location: "Tokyo & Singapore", events: [{ time: "2:45 AM", activity: "Narita Airport Layover", details: "Eat something, check out airport", type: "flight" }, { time: "6:00 AM", activity: "Board flight to Singapore", type: "flight" }, { time: "12:55 AM", activity: "Arrive Singapore", details: "Go to hotel (Fairmont Singapore) to drop off luggage.", type: "hotel" }] },
             { date: "April 16", location: "Singapore", events: [{ time: "Morning", activity: "Local Foods Hunt", details: "Kaya toast (Ya Kun), Chicken and Rice (Tien Tien@Maxwell), Chile Crab, Kway tiew, Laksa (Chinatown complex). McDonald's for Sean when we go to hawker centres", type: "food" }, { time: "Afternoon/Evening", activity: "Sightseeing", details: "Merlion park, sky park observation deck, Garden by the bay. Sunset at 7pm. Chatterbox restaurant (Hilton) dinner, ask about Fairmont restaurant for Sean?", type: "sightseeing" }] },
@@ -137,7 +181,71 @@
             { date: "May 6", location: "Tokyo / Return", events: [{ time: "Morning", activity: "Pack & Checkout", details: "Store luggage at hotel. Terminal 3 (Taxi from hotel 17min)", type: "hotel" }, { time: "6:10 PM", activity: "Flight Departure", details: "Flying out. Be there by 3pm", type: "flight" }, { time: "5:35 PM", activity: "WELCOME HOMEEEEEE", details: "Toronto, Canada", type: "special" }] }
         ];
 
-        function toggleTheme() {
+        let itineraryData = [];
+        let isEditing = false;
+        let currentUser = null;
+
+        // --- Firebase Cloud Storage Setup ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // 1. Authenticate user securely
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        };
+        initAuth();
+
+        // 2. Track authentication state and trigger sync
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                setupRealtimeListener();
+            }
+        });
+
+        // 3. Listen to the cloud database for real-time changes
+        function setupRealtimeListener() {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
+            
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    itineraryData = snapshot.data().days;
+                    renderItinerary();
+                } else {
+                    // Document doesn't exist yet, seed it with default data for the group
+                    itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+                    saveItinerary(); 
+                }
+            }, (error) => {
+                console.error("Cloud sync error:", error);
+            });
+        }
+
+        // 4. Save updates to the cloud database
+        async function saveItinerary() {
+            if (!currentUser) return; // Must be authenticated
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
+                await setDoc(docRef, { days: itineraryData });
+                renderItinerary(); // Update UI optimistically
+            } catch (error) {
+                console.error("Error saving to cloud:", error);
+            }
+        }
+
+        window.toggleEditMode = function() {
+            isEditing = !isEditing;
+            renderItinerary();
+        };
+
+        window.toggleTheme = function() {
             if (document.documentElement.classList.contains('dark')) {
                 document.documentElement.classList.remove('dark');
                 localStorage.theme = 'light';
@@ -145,7 +253,7 @@
                 document.documentElement.classList.add('dark');
                 localStorage.theme = 'dark';
             }
-        }
+        };
 
         function getIcon(type) {
             switch(type) {
@@ -171,7 +279,8 @@
 
         function renderItinerary() {
             const container = document.getElementById('itinerary');
-            itineraryData.forEach(day => {
+            container.innerHTML = ''; // Clear for re-rendering
+            itineraryData.forEach((day, dayIndex) => {
                 const daySection = document.createElement('section');
                 daySection.id = day.date.replace(' ', '-');
                 daySection.className = "mb-8 relative timeline-line";
@@ -183,16 +292,25 @@
                     </div>
                 `;
 
-                day.events.forEach(event => {
+                day.events.forEach((event, eventIndex) => {
                     const bgClass = getBg(event.type);
                     const icon = getIcon(event.type);
                     const isBirthday = day.isBirthday ? 'birthday-glow border-pink-400 dark:border-pink-500' : '';
 
+                    const editControls = isEditing ? `
+                        <div class="absolute right-2 top-2 flex gap-2">
+                            <button onclick="openModal(${dayIndex}, ${eventIndex})" class="p-1 text-slate-400 hover:text-indigo-500 bg-white dark:bg-slate-800 rounded-md shadow-sm border border-slate-200 dark:border-slate-600 text-sm transition-colors">✏️</button>
+                            <button onclick="deleteEvent(${dayIndex}, ${eventIndex})" class="p-1 text-slate-400 hover:text-red-500 bg-white dark:bg-slate-800 rounded-md shadow-sm border border-slate-200 dark:border-slate-600 text-sm transition-colors">🗑️</button>
+                        </div>
+                    ` : '';
+
                     html += `
-                        <div class="activity-card ml-10 mb-4 p-4 rounded-2xl border shadow-sm ${bgClass} ${isBirthday} relative">
+                        <div class="activity-card ml-10 mb-4 p-4 rounded-2xl border shadow-sm ${bgClass} ${isBirthday} relative pr-12">
                             <!-- Timeline Dot -->
                             <div class="absolute -left-10 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-indigo-500 border-4 border-slate-50 dark:border-slate-900 transition-colors"></div>
                             
+                            ${editControls}
+
                             <div class="flex justify-between items-start mb-1">
                                 <span class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">${event.time}</span>
                                 <span>${icon}</span>
@@ -203,12 +321,16 @@
                     `;
                 });
 
+                if (isEditing) {
+                    html += `<button onclick="openModal(${dayIndex})" class="ml-10 mt-2 text-sm text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-xl w-[calc(100%-2.5rem)] text-center hover:bg-indigo-100 dark:hover:bg-indigo-800/50 transition-colors">+ Add Activity</button>`;
+                }
+
                 daySection.innerHTML = html;
                 container.appendChild(daySection);
             });
 
             // Automatically check today's date and scroll after render
-            scrollToToday();
+            if(!isEditing) scrollToToday();
         }
 
         function scrollToDate(dateStr) {
@@ -240,8 +362,64 @@
             }
             // If the date isn't found (e.g., viewing before the trip starts), it will naturally just stay at the top.
         }
+        window.scrollToDate = scrollToDate;
 
-        window.onload = renderItinerary;
+        function openModal(dayIndex, eventIndex = null) {
+            document.getElementById('activityModal').classList.remove('hidden');
+            document.getElementById('modalDayIndex').value = dayIndex;
+            
+            if (eventIndex !== null) {
+                // Edit Mode
+                document.getElementById('modalTitle').innerText = 'Edit Activity';
+                document.getElementById('modalEventIndex').value = eventIndex;
+                const event = itineraryData[dayIndex].events[eventIndex];
+                document.getElementById('eventTime').value = event.time || '';
+                document.getElementById('eventActivity').value = event.activity || '';
+                document.getElementById('eventDetails').value = event.details || '';
+                document.getElementById('eventType').value = event.type || 'sightseeing';
+            } else {
+                // Add Mode
+                document.getElementById('modalTitle').innerText = 'Add Activity';
+                document.getElementById('modalEventIndex').value = '';
+                document.getElementById('activityForm').reset();
+            }
+        }
+        window.openModal = openModal;
+
+        function closeModal() {
+            document.getElementById('activityModal').classList.add('hidden');
+        }
+        window.closeModal = closeModal;
+
+        function deleteEvent(dayIndex, eventIndex) {
+            itineraryData[dayIndex].events.splice(eventIndex, 1);
+            saveItinerary();
+        }
+        window.deleteEvent = deleteEvent;
+
+        document.getElementById('activityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const dayIndex = document.getElementById('modalDayIndex').value;
+            const eventIndex = document.getElementById('modalEventIndex').value;
+            
+            const newEvent = {
+                time: document.getElementById('eventTime').value,
+                activity: document.getElementById('eventActivity').value,
+                details: document.getElementById('eventDetails').value,
+                type: document.getElementById('eventType').value
+            };
+
+            if (eventIndex !== '') {
+                itineraryData[dayIndex].events[eventIndex] = newEvent;
+            } else {
+                itineraryData[dayIndex].events.push(newEvent);
+            }
+
+            saveItinerary();
+            closeModal();
+        });
+
+        // Initial render is now handled automatically when Firebase connects
     </script>
 </body>
 </html>
