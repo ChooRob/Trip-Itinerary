@@ -185,58 +185,82 @@
         let isEditing = false;
         let currentUser = null;
 
-        // --- Firebase Cloud Storage Setup ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Check if we are in the preview environment (Cloud) or on GitHub Pages (Local)
+        const hasCloudDatabase = true; 
 
-        // 1. Authenticate user securely
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        };
-        initAuth();
+        if (hasCloudDatabase) {
+            // --- Firebase Cloud Storage Setup ---
+            // PASTE YOUR FIREBASE CONFIG HERE:
+            const firebaseConfig = {
+            apiKey: "AIzaSyCb9wwrGtan05RmWUP3BWRt1hatjT3gCew",
+            authDomain: "asia-trip-itinerary.firebaseapp.com",
+            projectId: "asia-trip-itinerary",
+            storageBucket: "asia-trip-itinerary.firebasestorage.app",
+            messagingSenderId: "847149756207",
+            appId: "1:847149756207:web:1e7dea5bd0427c36afbbda"
+            };
 
-        // 2. Track authentication state and trigger sync
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                setupRealtimeListener();
-            }
-        });
+            // Initialize Firebase
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const appId = 'my-japan-trip'; // A unique ID for your database folder
 
-        // 3. Listen to the cloud database for real-time changes
-        function setupRealtimeListener() {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
-            
-            onSnapshot(docRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    itineraryData = snapshot.data().days;
-                    renderItinerary();
+            // 1. Authenticate user securely
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    // Document doesn't exist yet, seed it with default data for the group
-                    itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
-                    saveItinerary(); 
+                    await signInAnonymously(auth);
                 }
-            }, (error) => {
-                console.error("Cloud sync error:", error);
+            };
+            initAuth();
+
+            // 2. Track authentication state and trigger sync
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
+                    onSnapshot(docRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            itineraryData = snapshot.data().days;
+                            renderItinerary();
+                        } else {
+                            itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+                            saveItinerary(); 
+                        }
+                    }, (error) => console.error("Cloud sync error:", error));
+                }
             });
+        } else {
+            // --- GitHub Pages Fallback (Local Storage) ---
+            console.log("Running in Local Mode on GitHub Pages");
+            if (localStorage.getItem('myTripItinerary')) {
+                itineraryData = JSON.parse(localStorage.getItem('myTripItinerary'));
+            } else {
+                itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+            }
+            // Render immediately since we don't have to wait for the cloud
+            setTimeout(renderItinerary, 0);
         }
 
-        // 4. Save updates to the cloud database
+        // 4. Save updates to the correct database
         async function saveItinerary() {
-            if (!currentUser) return; // Must be authenticated
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
-                await setDoc(docRef, { days: itineraryData });
-                renderItinerary(); // Update UI optimistically
-            } catch (error) {
-                console.error("Error saving to cloud:", error);
+            if (hasCloudDatabase) {
+                if (!currentUser) return; 
+                try {
+                    const db = getFirestore();
+                    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', 'shared');
+                    await setDoc(docRef, { days: itineraryData });
+                    renderItinerary(); 
+                } catch (error) {
+                    console.error("Error saving to cloud:", error);
+                }
+            } else {
+                // Local save for GitHub Pages
+                localStorage.setItem('myTripItinerary', JSON.stringify(itineraryData));
+                renderItinerary();
             }
         }
 
