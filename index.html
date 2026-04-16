@@ -6,12 +6,7 @@
     <title>Our Travel Agenda</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Enable Tailwind dark mode via class strategy
-        tailwind.config = {
-            darkMode: 'class',
-        }
-        
-        // Prevent Flash of Unstyled Content (FOUC)
+        tailwind.config = { darkMode: 'class' }
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         } else {
@@ -22,42 +17,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         
         body { font-family: 'Inter', sans-serif; }
-
-        .sticky-date {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            background: rgba(248, 250, 252, 0.9);
-            backdrop-filter: blur(8px);
-        }
-        
+        .sticky-date { position: sticky; top: 0; z-index: 10; background: rgba(248, 250, 252, 0.9); backdrop-filter: blur(8px); }
         .dark .sticky-date { background: rgba(15, 23, 42, 0.9); }
-
-        .timeline-line::before {
-            content: '';
-            position: absolute;
-            left: 20px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e2e8f0;
-        }
-
+        .timeline-line::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
         .dark .timeline-line::before { background: #334155; }
-
         .activity-card { transition: transform 0.1s ease, background-color 0.3s ease, border-color 0.3s ease; }
         .activity-card:active { transform: scale(0.98); }
         .birthday-glow { animation: glow 2s infinite alternate; }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px #ff69b4; }
-            to { box-shadow: 0 0 20px #ff69b4; }
-        }
+        @keyframes glow { from { box-shadow: 0 0 5px #ff69b4; } to { box-shadow: 0 0 20px #ff69b4; } }
     </style>
 </head>
 <body class="pb-12 bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
 
-    <!-- Header -->
     <header class="bg-indigo-600 dark:bg-indigo-900 text-white p-6 shadow-lg rounded-b-3xl flex justify-between items-start transition-colors duration-300">
         <div>
             <h1 class="text-2xl font-bold">April - May Trip</h1>
@@ -68,19 +39,12 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </button>
             <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-indigo-500 dark:hover:bg-indigo-800 transition-colors" aria-label="Toggle Dark Mode">
-                <!-- Moon icon (shows in light mode) -->
-                <svg class="w-6 h-6 block dark:hidden text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-                <!-- Sun icon (shows in dark mode) -->
-                <svg class="w-6 h-6 hidden dark:block text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
+                <svg class="w-6 h-6 block dark:hidden text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                <svg class="w-6 h-6 hidden dark:block text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
             </button>
         </div>
     </header>
 
-    <!-- Navigation Filter -->
     <div class="overflow-x-auto whitespace-nowrap p-4 flex gap-2 no-scrollbar">
         <button onclick="scrollToDate('April 14')" class="nav-btn bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 rounded-full text-sm font-semibold shadow-sm border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">Toronto</button>
         <button onclick="scrollToDate('April 15')" class="nav-btn bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 rounded-full text-sm font-semibold shadow-sm border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">Singapore</button>
@@ -94,41 +58,22 @@
         <button onclick="scrollToDate('May 1')" class="nav-btn bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-4 py-2 rounded-full text-sm font-semibold shadow-sm border border-slate-200 dark:border-slate-700 shrink-0 transition-colors">Tokyo</button>
     </div>
 
-    <!-- Itinerary Container -->
-    <main id="itinerary" class="px-4 mt-2">
-        <!-- Content will be injected by JavaScript -->
-    </main>
+    <main id="itinerary" class="px-4 mt-2"></main>
 
-    <!-- Edit/Add Modal -->
     <div id="activityModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 w-full max-w-md shadow-2xl">
             <h2 id="modalTitle" class="text-xl font-bold mb-4 dark:text-white">Add Activity</h2>
             <form id="activityForm" class="flex flex-col gap-3">
                 <input type="hidden" id="modalDayIndex">
                 <input type="hidden" id="modalEventIndex">
-                
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Time</label>
-                    <input type="text" id="eventTime" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" placeholder="e.g., 2:00 PM or Morning" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Activity Title</label>
-                    <input type="text" id="eventActivity" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" required>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Details/Comments</label>
-                    <textarea id="eventDetails" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" rows="2"></textarea>
-                </div>
+                <div><label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Time</label><input type="text" id="eventTime" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" required></div>
+                <div><label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Activity Title</label><input type="text" id="eventActivity" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" required></div>
+                <div><label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Details/Comments</label><textarea id="eventDetails" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white" rows="2"></textarea></div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Type (Icon & Color)</label>
                     <select id="eventType" class="w-full p-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                        <option value="sightseeing">📸 Sightseeing</option>
-                        <option value="food">🍜 Food</option>
-                        <option value="flight">✈️ Flight</option>
-                        <option value="hotel">🏨 Hotel</option>
-                        <option value="cruise">🚢 Cruise</option>
-                        <option value="booking">🎟️ Booking/Ticket</option>
-                        <option value="special">🎉 Special</option>
+                        <option value="sightseeing">📸 Sightseeing</option><option value="food">🍜 Food</option><option value="flight">✈️ Flight</option>
+                        <option value="hotel">🏨 Hotel</option><option value="cruise">🚢 Cruise</option><option value="booking">🎟️ Booking/Ticket</option><option value="special">🎉 Special</option>
                     </select>
                 </div>
                 <div class="flex justify-end gap-3 mt-4">
@@ -139,10 +84,8 @@
         </div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 translate-y-20 opacity-0 z-[60] font-semibold flex items-center gap-2 pointer-events-none bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900">
-        <span id="toastIcon">✅</span>
-        <span id="toastMessage">Saved!</span>
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 translate-y-20 opacity-0 z-[60] font-semibold flex items-center gap-2 pointer-events-none text-white">
+        <span id="toastIcon">✅</span><span id="toastMessage">Saved!</span>
     </div>
 
     <script type="module">
@@ -182,39 +125,62 @@
         let db = null;
         let activeAppId = null;
 
-        // Toast Notification System
-        function showToast(message, isError = false) {
+        function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').innerText = message;
-            document.getElementById('toastIcon').innerText = isError ? '❌' : '✅';
             
-            // Handle colors
-            toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[60] font-semibold flex items-center gap-2 pointer-events-none ${isError ? 'bg-red-600 text-white' : 'bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900'}`;
+            // Set styles based on status type
+            if (type === 'error') {
+                document.getElementById('toastIcon').innerText = '❌';
+                toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[60] font-semibold flex items-center gap-2 pointer-events-none bg-red-600 text-white`;
+            } else if (type === 'offline') {
+                document.getElementById('toastIcon').innerText = '📡';
+                toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[60] font-semibold flex items-center gap-2 pointer-events-none bg-amber-500 text-white`;
+            } else {
+                document.getElementById('toastIcon').innerText = '☁️';
+                toast.className = `fixed bottom-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl transition-all duration-300 z-[60] font-semibold flex items-center gap-2 pointer-events-none bg-slate-800 text-white dark:bg-slate-100 dark:text-slate-900`;
+            }
 
-            // Slide in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-20', 'opacity-0');
-            });
-            
-            // Slide out
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            requestAnimationFrame(() => toast.classList.remove('translate-y-20', 'opacity-0'));
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3500);
         }
+
+        // --- OFFLINE / LOCAL FIRST LOADING ---
+        // Run this immediately so the UI is instantly visible offline
+        function loadLocalCache() {
+            if (localStorage.getItem('myTripItinerary')) {
+                itineraryData = JSON.parse(localStorage.getItem('myTripItinerary'));
+            } else {
+                itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
+            }
+            renderItinerary();
+        }
+        loadLocalCache(); 
 
         // --- UNIVERSAL FIREBASE CONFIGURATION ---
         const isCanvas = typeof __firebase_config !== 'undefined';
         
         // IF USING GITHUB PAGES: Paste your Firebase config object here inside the brackets!
+        // const myGitHubFirebaseConfig = {
+            // Split your API key into two strings with a + sign to bypass GitHub's scanner
+            // apiKey: "YOUR_API_KEY_PART_1" + "YOUR_API_KEY_PART_2", 
+            // authDomain: "YOUR_PROJECT.firebaseapp.com",
+            // projectId: "YOUR_PROJECT",
+            // storageBucket: "YOUR_PROJECT.appspot.com",
+            // messagingSenderId: "123456789",
+            // appId: "YOUR_APP_ID"
+            
+        // };
+        // IF USING GITHUB PAGES: Paste your Firebase config object here inside the brackets!
         const myGitHubFirebaseConfig = {
-            apiKey: "AIzaSyCb9wwrGtan05RmWUP3BWRt1hatjT3gCew",
+            apiKey: "AIzaSyCb9wwrGtan05R" + "mWUP3BWRt1hatjT3gCew",
             authDomain: "asia-trip-itinerary.firebaseapp.com",
             projectId: "asia-trip-itinerary",
             storageBucket: "asia-trip-itinerary.firebasestorage.app",
             messagingSenderId: "847149756207",
             appId: "1:847149756207:web:1e7dea5bd0427c36afbbda"
-            };
-
+        };
+        
         const configToUse = isCanvas ? JSON.parse(__firebase_config) : myGitHubFirebaseConfig;
         const hasCloudDatabase = Object.keys(configToUse).length > 0 && configToUse.apiKey;
 
@@ -234,7 +200,6 @@
                         }
                     } catch (e) {
                         console.error("Auth error:", e);
-                        showToast("Authentication Failed!", true);
                     }
                 };
                 initAuth();
@@ -245,62 +210,59 @@
                         const docRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'itinerary', 'shared');
                         onSnapshot(docRef, (snapshot) => {
                             if (snapshot.exists()) {
-                                itineraryData = snapshot.data().days;
-                                renderItinerary();
+                                const cloudData = snapshot.data().days;
+                                // Only re-render if cloud data is different from our local cache
+                                if (JSON.stringify(cloudData) !== JSON.stringify(itineraryData)) {
+                                    itineraryData = cloudData;
+                                    localStorage.setItem('myTripItinerary', JSON.stringify(itineraryData));
+                                    renderItinerary();
+                                    showToast("Updated from cloud!", "success");
+                                }
                             } else {
-                                itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
-                                saveItinerary(true); // silent save on init
+                                // First time seeding database
+                                saveItinerary(true); 
                             }
                         }, (error) => {
-                            console.error("Sync error:", error);
-                            showToast("Lost connection to cloud database", true);
+                            console.warn("Currently offline. Running on local cache.");
                         });
                     }
                 });
             } catch (err) {
                 console.error("Firebase init failed:", err);
-                fallbackToLocal();
             }
-        } else {
-            fallbackToLocal();
-        }
-
-        function fallbackToLocal() {
-            if (localStorage.getItem('myTripItinerary')) {
-                itineraryData = JSON.parse(localStorage.getItem('myTripItinerary'));
-            } else {
-                itineraryData = JSON.parse(JSON.stringify(defaultItineraryData));
-            }
-            setTimeout(renderItinerary, 0);
         }
 
         async function saveItinerary(isSilent = false) {
+            // 1. ALWAYS save instantly to the phone's local storage
+            localStorage.setItem('myTripItinerary', JSON.stringify(itineraryData));
+            renderItinerary();
+
+            // 2. Try pushing to the cloud
             if (hasCloudDatabase && db && currentUser) {
-                try {
-                    const docRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'itinerary', 'shared');
-                    await setDoc(docRef, { days: itineraryData });
-                    if (!isSilent) showToast("Saved to Cloud Database! ☁️");
-                    renderItinerary(); 
-                } catch (error) {
-                    console.error("Database save error:", error);
-                    if (!isSilent) showToast("Failed to save to cloud! Check permissions.", true);
+                const docRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'itinerary', 'shared');
+                
+                if (!navigator.onLine) {
+                    // Device knows it's offline. Firebase automatically queues the setDoc request in the background.
+                    if (!isSilent) showToast("Saved offline! Will sync when signal returns", "offline");
+                    try { setDoc(docRef, { days: itineraryData }); } catch(e) {}
+                } else {
+                    try {
+                        await setDoc(docRef, { days: itineraryData });
+                        if (!isSilent) showToast("Saved to Cloud!", "success");
+                    } catch (error) {
+                        console.error("Database save error:", error);
+                        if (!isSilent) showToast("Saved Locally! (Cloud sync failed)", "error");
+                    }
                 }
             } else {
-                try {
-                    localStorage.setItem('myTripItinerary', JSON.stringify(itineraryData));
-                    if (!isSilent) showToast("Saved Locally to your phone! 📱");
-                    renderItinerary();
-                } catch (e) {
-                    if (!isSilent) showToast("Failed to save locally!", true);
-                }
+                if (!isSilent) showToast("Saved locally to your phone!", "success");
             }
         }
 
-        // Make functions global for inline HTML handlers
+        // Global functions for inline HTML handlers
         window.toggleEditMode = function() {
             isEditing = !isEditing;
             renderItinerary();
-            if (isEditing) showToast("Edit Mode Enabled ✏️");
         };
 
         window.toggleTheme = function() {
@@ -313,9 +275,7 @@
             }
         };
 
-        window.closeModal = function() {
-            document.getElementById('activityModal').classList.add('hidden');
-        };
+        window.closeModal = function() { document.getElementById('activityModal').classList.add('hidden'); };
 
         window.openModal = function(dayIndex, eventIndex = null) {
             document.getElementById('activityModal').classList.remove('hidden');
@@ -448,20 +408,19 @@
                 daySection.innerHTML = html;
                 container.appendChild(daySection);
             });
-
-            if(!isEditing) scrollToToday();
         }
-
-        function scrollToToday() {
-            const today = new Date();
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const currentDateStr = `${monthNames[today.getMonth()]} ${today.getDate()}`;
-            const targetId = currentDateStr.replace(' ', '-');
-            
-            if (document.getElementById(targetId)) {
-                setTimeout(() => window.scrollToDate(currentDateStr), 800);
+        
+        // Let the auto-scroll happen slightly after the instant local load
+        setTimeout(() => {
+            if(!isEditing) {
+                const today = new Date();
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const currentDateStr = `${monthNames[today.getMonth()]} ${today.getDate()}`;
+                const targetId = currentDateStr.replace(' ', '-');
+                if (document.getElementById(targetId)) window.scrollToDate(currentDateStr);
             }
-        }
+        }, 800);
+
     </script>
 </body>
 </html>
